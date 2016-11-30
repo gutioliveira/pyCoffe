@@ -5,6 +5,8 @@ from .forms import NameForm
 
 images_path = '../Desktop/VOCdevkit/VOC2007/JPEGImages'
 
+import os.path
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,8 +20,9 @@ from scipy import misc
 
 labels = []
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 home_dir = os.getenv("HOME")
-caffe_root = os.path.join(home_dir, 'caffe')
+caffe_root = os.path.join(home_dir, 'Git/caffe')
 sys.path.insert(0, os.path.join(caffe_root, 'python'))
 
 import caffe
@@ -64,18 +67,9 @@ def predict_imageNet(image_filename):
     plt.imshow(image)
     plt.axis('off')
 
-    print 'probabilities and labels:'
     predictions = zip(output_prob[top_inds], labels[top_inds])
 
-    string = ""
-
-    for p in predictions:
-        string += str(p) + "</br>"
-
-    print '#######################'
-    print string
-    print '#######################'
-    return string
+    return predictions
 
 def index(request):
 
@@ -89,16 +83,30 @@ def index(request):
 
 def detail(request):
 
-	my_image_url = request.POST['url']
+    my_image_url = request.POST['url']
 
-	urllib.urlretrieve (my_image_url, "image.jpg")
+    urllib.urlretrieve (my_image_url, PROJECT_ROOT + "/static/img/image.jpg")
 
-	string = predict_imageNet('image.jpg')
+    predictions = predict_imageNet('prob/static/img/image.jpg')
 
-	template = loader.get_template('prob/detail.html')
+    template = loader.get_template('prob/detail.html')
 
-	context = {
-        'latest_question_list': '',
+    context = {
+        'predictions': predictions,
     }
 
-	return HttpResponse(string)
+    return render(request,'prob/detail.html', context)
+
+def localImage(request):
+    image = request.FILES['image']
+    with open(PROJECT_ROOT + "/static/img/image.jpg", "wb+") as destination:
+        for chunk in image.chunks():
+            destination.write(chunk)
+
+    predictions = predict_imageNet('prob/static/img/image.jpg')
+
+    context = {
+        'predictions': predictions,
+    }
+
+    return render(request,'prob/detail.html', context)
