@@ -22,7 +22,7 @@ labels = []
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 home_dir = os.getenv("HOME")
-caffe_root = os.path.join(home_dir, 'Git/caffe')
+caffe_root = os.path.join(home_dir, 'caffe')
 sys.path.insert(0, os.path.join(caffe_root, 'python'))
 
 import caffe
@@ -98,6 +98,9 @@ def detail(request):
     return render(request,'prob/detail.html', context)
 
 def localImage(request):
+
+    print '$$$$$$$$$$$$$$$$$$$'
+
     image = request.FILES['image']
     with open(PROJECT_ROOT + "/static/img/image.jpg", "wb+") as destination:
         for chunk in image.chunks():
@@ -105,8 +108,62 @@ def localImage(request):
 
     predictions = predict_imageNet('prob/static/img/image.jpg')
 
+    print predictions
+
+    predicitons = format(predictions)
+
     context = {
-        'predictions': predictions,
+        'predictions': predicitons,
     }
 
     return render(request,'prob/detail.html', context)
+
+def format(predictions):
+
+    lista = []
+
+    for p in predictions:
+        S = []
+        aux = 0
+        for i in p:
+            if aux == 0:
+                i = float(i) * 100.0
+                i = "{0:.2f}".format(i) + "%"
+                S.append(i)
+                aux = 1
+            else:
+                i = i.split(',')
+
+                print i[0].split().pop(0)
+
+                i[0] = i[0].split()
+
+                i[0].pop(0)
+
+                string = ""
+
+                for k in i[0]:
+                    string += " " + k
+
+                i[0] = string
+
+                count = 0
+
+                for x in i:
+                    i[count] = x.strip()
+                    count += 1
+
+                print i
+
+                S.append(i)
+
+        string = str(S[0]) + " "
+
+        for x in S[1]:
+            string += str(x) + ", "
+
+        string = string[:-2]
+
+        lista.append(string)        
+
+    return lista
