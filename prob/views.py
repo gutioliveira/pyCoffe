@@ -85,9 +85,8 @@ def detail(request):
 
     my_image_url = request.POST['url']
 
-    urllib.urlretrieve (my_image_url, PROJECT_ROOT + "/static/img/image.jpg")
-
     try:
+        urllib.urlretrieve (my_image_url, PROJECT_ROOT + "/static/img/image.jpg")
         predictions = predict_imageNet('prob/static/img/image.jpg')
     except Exception:
         return image_not_found(request)
@@ -180,5 +179,4 @@ def image_not_found(request):
     context = {
         'predictions': "error",
     }
-    urllib.urlretrieve ("http://www.51allout.co.uk/wp-content/uploads/2012/02/Image-not-found.gif", PROJECT_ROOT + "/static/img/image.jpg")
     return render(request,'prob/detail.html', context)
