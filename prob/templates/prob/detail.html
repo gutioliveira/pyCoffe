@@ -28,7 +28,11 @@
         <div class="center">
           <div class="card">
             <div class="card-image">
+            {% if predictions != "error" %}
               <img src="{% static "img/image.jpg" %}">
+            {% else %}
+              <img src="{% static "img/error.png" %}">
+            {% endif %}
             </div>
           </div>
         </div>

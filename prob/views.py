@@ -22,7 +22,7 @@ labels = []
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 home_dir = os.getenv("HOME")
-caffe_root = os.path.join(home_dir, 'Git/caffe')
+caffe_root = os.path.join(home_dir, 'caffe')
 sys.path.insert(0, os.path.join(caffe_root, 'python'))
 
 import caffe
@@ -87,7 +87,10 @@ def detail(request):
 
     urllib.urlretrieve (my_image_url, PROJECT_ROOT + "/static/img/image.jpg")
 
-    predictions = predict_imageNet('prob/static/img/image.jpg')
+    try:
+        predictions = predict_imageNet('prob/static/img/image.jpg')
+    except Exception:
+        return image_not_found(request)
 
     predictions = format(predictions)
 
@@ -100,14 +103,19 @@ def detail(request):
 def localImage(request):
 
     print '$$$$$$$$$$$$$$$$$$$'
+    try:
+        image = request.FILES['image']
+    except Exception:
+        return image_not_found(request)
 
-    image = request.FILES['image']
     with open(PROJECT_ROOT + "/static/img/image.jpg", "wb+") as destination:
         for chunk in image.chunks():
             destination.write(chunk)
 
-    predictions = predict_imageNet('prob/static/img/image.jpg')
-
+    try:
+        predictions = predict_imageNet('prob/static/img/image.jpg')
+    except Exception:
+        return image_not_found(request)
     print predictions
 
     predicitons = format(predictions)
@@ -167,3 +175,10 @@ def format(predictions):
         lista.append(string)
 
     return lista
+
+def image_not_found(request):
+    context = {
+        'predictions': "error",
+    }
+    urllib.urlretrieve ("http://www.51allout.co.uk/wp-content/uploads/2012/02/Image-not-found.gif", PROJECT_ROOT + "/static/img/image.jpg")
+    return render(request,'prob/detail.html', context)
