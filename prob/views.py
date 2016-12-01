@@ -89,7 +89,7 @@ def detail(request):
 
     predictions = predict_imageNet('prob/static/img/image.jpg')
 
-    template = loader.get_template('prob/detail.html')
+    predictions = format(predictions)
 
     context = {
         'predictions': predictions,
