@@ -22,7 +22,7 @@ labels = []
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 home_dir = os.getenv("HOME")
-caffe_root = os.path.join(home_dir, 'caffe')
+caffe_root = os.path.join(home_dir, 'Git/caffe')
 sys.path.insert(0, os.path.join(caffe_root, 'python'))
 
 import caffe
@@ -164,6 +164,6 @@ def format(predictions):
 
         string = string[:-2]
 
-        lista.append(string)        
+        lista.append(string)
 
     return lista
