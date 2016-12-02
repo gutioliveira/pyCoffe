@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, render_to_response
 from django.template import loader, RequestContext
 from .forms import NameForm
+import cv2
 
 images_path = '../Desktop/VOCdevkit/VOC2007/JPEGImages'
 
@@ -71,6 +72,12 @@ def predict_imageNet(image_filename):
 
     return predictions
 
+def get_image_url(url):
+    cap = cv2.VideoCapture(url)
+    ret,img = cap.read()
+
+    return img
+
 def index(request):
 
 	template = loader.get_template('prob/index.html')
@@ -93,8 +100,12 @@ def detail(request):
 
     predictions = format(predictions)
 
+    image = get_image_url(my_image_url)
+    image_detected = detect(image)
+
     context = {
         'predictions': predictions,
+        'faces': image_detected,
     }
 
     return render(request,'prob/detail.html', context)
@@ -119,9 +130,17 @@ def localImage(request):
 
     predicitons = format(predictions)
 
+    image = cv2.VideoCapture("prob/static/img/image.jpg")
+    ret, img = image.read()
+
+    faces = detect(img)
+
     context = {
         'predictions': predicitons,
+        'faces': faces,
     }
+
+
 
     return render(request,'prob/detail.html', context)
 
@@ -180,3 +199,35 @@ def image_not_found(request):
         'predictions': "error",
     }
     return render(request,'prob/detail.html', context)
+
+def detect(frame):
+    height, width, depth = frame.shape
+
+    # create grayscale version
+    grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+ 
+    # equalize histogram
+    cv2.equalizeHist(grayscale, grayscale)
+
+    # detect objects
+    classifier = cv2.CascadeClassifier("/home/gustavo/caffe/haarcascade_frontalface_alt.xml")
+
+    # print classifier
+
+    coords = []
+
+    DOWNSCALE = 4
+    minisize = (frame.shape[1]/DOWNSCALE,frame.shape[0]/DOWNSCALE)
+    miniframe = cv2.resize(frame, minisize)
+    faces = classifier.detectMultiScale(miniframe)
+    if len(faces)>0:
+        for i in faces:
+            x, y, w, h = [ v*DOWNSCALE for v in i ]
+
+            coords.append((x,y,w,h))
+            print x,y,w,h
+            cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0))
+    
+    cv2.imwrite("prob/static/img/image.jpg", frame)
+
+    return str(len(faces)) + ' face(s) detectadas.'
