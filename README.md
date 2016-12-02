@@ -25,7 +25,9 @@ It is necessary to set up where Caffe is installed on your machine, go to pyCoff
 ```bash
 caffe_root = os.path.join(home_dir, 'caffe')
 ```
-If your coffe folder is inside your home directory, no reason to change it.
+Download this [file](https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_alt.xml) and save it on your caffe directory, it is necessary for the face recognition to work.
+
+If your caffe folder is inside your home directory, no reason to change it.
 
 After you set up your caffe path, just type inside pyCoffe folder:
 

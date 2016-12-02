@@ -210,7 +210,7 @@ def detect(frame):
     cv2.equalizeHist(grayscale, grayscale)
 
     # detect objects
-    classifier = cv2.CascadeClassifier("/home/gustavo/caffe/haarcascade_frontalface_alt.xml")
+    classifier = cv2.CascadeClassifier(caffe_root+"/haarcascade_frontalface_alt.xml")
 
     # print classifier
 
